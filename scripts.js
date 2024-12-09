@@ -32,23 +32,25 @@ function displayProducts(filteredProducts) {
 
 function filterProducts() {
     const categoryFilter = document.getElementById('category-filter').value;
-    if (categoryFilter === 'all') {
-        displayProducts(products);
-    } else {
-        const filteredProducts = products.filter(product => product.category === categoryFilter);
-        displayProducts(filteredProducts);
-    }
+    const filteredProducts = categoryFilter === 'all'
+        ? products
+        : products.filter(product => product.category === categoryFilter);
+    displayProducts(filteredProducts);
 }
 
 function addToCart(productId) {
     const product = products.find(product => product.id === productId);
-    cart.push(product);
-    localStorage.setItem('cart', JSON.stringify(cart));
-    displayNotification(`${product.name} به سبد خرید اضافه شد!`);
+    if (product) {
+        cart.push(product);
+        localStorage.setItem('cart', JSON.stringify(cart));
+        displayNotification(`${product.name} به سبد خرید اضافه شد!`);
+    }
 }
 
 function displayCart() {
     const cartDiv = document.getElementById('cart');
+    if (!cartDiv) return;
+
     cartDiv.innerHTML = '';
     cart.forEach(item => {
         const cartItemDiv = document.createElement('div');
@@ -68,6 +70,8 @@ function displayCart() {
 
 function displayNotification(message) {
     const notification = document.getElementById('notification');
+    if (!notification) return;
+
     notification.textContent = message;
     notification.style.display = 'block';
     setTimeout(() => {
