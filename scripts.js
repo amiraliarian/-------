@@ -88,3 +88,7 @@ if (document.getElementById('product-list')) {
 if (document.getElementById('cart')) {
     displayCart();
 }
+
+document.querySelector('.menu-toggle').addEventListener('click', () => {
+    document.querySelector('.nav-links').classList.toggle('active');
+});

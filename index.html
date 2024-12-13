@@ -9,27 +9,37 @@
 <body>
     <header>
         <nav>
-            <ul>
+            <div class="logo">
+                <a href="index.html">فروشگاه</a>
+            </div>
+            <ul class="nav-links">
                 <li><a href="index.html">خانه</a></li>
                 <li><a href="cart.html">سبد خرید</a></li>
                 <li><a href="login.html">ورود</a></li>
             </ul>
+            <div class="menu-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
         </nav>
     </header>
-    <h1>فروشگاه</h1>
-    <div>
-        <label for="category-filter">دسته‌بندی:</label>
-        <select id="category-filter">
-            <option value="all">همه</option>
-            <option value="electronics">الکترونیک</option>
-            <option value="clothing">پوشاک</option>
-            <option value="food">مواد غذایی</option>
-        </select>
-    </div>
-    <div class="products" id="product-list">
-      
-    </div>
-    <div id="notification" class="notification"></div>
+    <main>
+        <h1>فروشگاه</h1>
+        <div>
+            <label for="category-filter">دسته‌بندی:</label>
+            <select id="category-filter">
+                <option value="all">همه</option>
+                <option value="electronics">الکترونیک</option>
+                <option value="clothing">پوشاک</option>
+                <option value="food">مواد غذایی</option>
+            </select>
+        </div>
+        <div class="products" id="product-list">
+            <!-- محصولات در اینجا نمایش داده می‌شوند -->
+        </div>
+        <div id="notification" class="notification"></div>
+    </main>
     <script src="scripts.js"></script>
 </body>
 </html>
