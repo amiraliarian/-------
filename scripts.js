@@ -13,7 +13,7 @@ const products = [
     { id: 12, name: 'بستنی', category: 'food', price: 20000 }
 ];
 
-let cart = JSON.parse(localStorage.getItem('cart')) || [];
+let cart = [];
 
 function displayProducts(filteredProducts) {
     const productList = document.getElementById('product-list');
@@ -41,54 +41,125 @@ function filterProducts() {
 function addToCart(productId) {
     const product = products.find(product => product.id === productId);
     if (product) {
-        cart.push(product);
+        const existingProduct = cart.find(item => item.id === productId);
+        if (existingProduct) {
+            existingProduct.quantity++;
+        } else {
+            product.quantity = 1;
+            cart.push(product);
+        }
         localStorage.setItem('cart', JSON.stringify(cart));
-        displayNotification(`${product.name} به سبد خرید اضافه شد!`);
+        displayNotification(`${product.name} به سبد خرید اضافه شد`);
+        updateCartDisplay();
     }
-}
-
-function displayCart() {
-    const cartDiv = document.getElementById('cart');
-    if (!cartDiv) return;
-
-    cartDiv.innerHTML = '';
-    cart.forEach(item => {
-        const cartItemDiv = document.createElement('div');
-        cartItemDiv.className = 'cart-item';
-        cartItemDiv.innerHTML = `
-            <h3>${item.name}</h3>
-            <p>قیمت: ${item.price} تومان</p>
-        `;
-        cartDiv.appendChild(cartItemDiv);
-    });
-
-    const totalPrice = cart.reduce((total, item) => total + item.price, 0);
-    const totalPriceElement = document.createElement('p');
-    totalPriceElement.textContent = `مجموع قیمت: ${totalPrice} تومان`;
-    cartDiv.appendChild(totalPriceElement);
 }
 
 function displayNotification(message) {
     const notification = document.getElementById('notification');
     if (!notification) return;
 
-    notification.textContent = message;
+    notification.innerHTML = `${message} <br> <button onclick="hideNotification(); openCart()">رفتن به سبد خرید</button> <button onclick="hideNotification(); removeLastItem()">حذف محصول</button>`;
     notification.style.display = 'block';
     setTimeout(() => {
         notification.style.display = 'none';
     }, 3000);
 }
 
-document.getElementById('category-filter').addEventListener('change', filterProducts);
-
-if (document.getElementById('product-list')) {
-    displayProducts(products);
+function hideNotification() {
+    const notification = document.getElementById('notification');
+    notification.style.display = 'none';
 }
 
-if (document.getElementById('cart')) {
-    displayCart();
+function removeLastItem() {
+    cart.pop();
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCartDisplay();
+}
+
+function openCart() {
+    updateCartDisplay();
+    const modal = document.getElementById('cart-modal');
+    modal.style.display = "block";
+}
+
+function updateCartDisplay() {
+    const cartContainer = document.getElementById('cart-items');
+    cartContainer.innerHTML = '';
+    cart.forEach(product => {
+        const productElement = document.createElement('div');
+        productElement.className = 'cart-item';
+        productElement.innerHTML = `
+            <h3>${product.name}</h3>
+            <p>قیمت: ${product.price} تومان</p>
+            <p>تعداد: 
+                <button onclick="decreaseQuantity(${product.id})">-</button>
+                ${product.quantity}
+                <button onclick="increaseQuantity(${product.id})">+</button>
+            </p>
+            <button onclick="removeFromCart(${product.id})">حذف</button>
+        `;
+        cartContainer.appendChild(productElement);
+    });
+
+    const totalPrice = cart.reduce((total, item) => total + item.price * item.quantity, 0);
+    const totalPriceElement = document.createElement('p');
+    totalPriceElement.textContent = `مجموع قیمت: ${totalPrice} تومان`;
+    cartContainer.appendChild(totalPriceElement);
+}
+
+function removeFromCart(productId) {
+    cart = cart.filter(item => item.id !== productId);
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCartDisplay();
+}
+
+function decreaseQuantity(productId) {
+    const product = cart.find(item => item.id === productId);
+    if (product && product.quantity > 1) {
+        product.quantity--;
+    } else {
+        removeFromCart(productId);
+    }
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCartDisplay();
+}
+
+function increaseQuantity(productId) {
+    const product = cart.find(item => item.id === productId);
+    if (product) {
+        product.quantity++;
+    }
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCartDisplay();
+}
+
+// مدیریت مدال
+var modal = document.getElementById("cart-modal");
+var btn = document.getElementById("cart-button");
+var span = document.getElementsByClassName("close")[0];
+
+btn.onclick = function() {
+    openCart();
+}
+
+span.onclick = function() {
+    modal.style.display = "none";
+}
+
+window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+
+document.getElementById('category-filter').addEventListener('change', filterProducts);
+
+window.onload = function() {
+    localStorage.removeItem('cart');
+    displayProducts(products);
 }
 
 document.querySelector('.menu-toggle').addEventListener('click', () => {
     document.querySelector('.nav-links').classList.toggle('active');
+    document.body.classList.toggle('blurred');
 });
